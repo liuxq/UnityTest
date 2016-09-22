@@ -5,12 +5,31 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 
+public class Triangle3D
+{
+    public uint p1_;
+    public uint p2_;
+    public uint p3_;
+
+    public Triangle3D(uint p1, uint p2, uint p3)
+    {
+        p1_ = p1;
+        p2_ = p2;
+        p3_ = p3;
+    }
+}
+
+[Serializable]
 public class SmfMesh : UnityEngine.Object
 {
     public List<Vector3> m_listPoints = new List<Vector3>();
     public List<Vector3> m_listNormals = new List<Vector3>();
     public List<Vector2> m_listUVs = new List<Vector2>();
     public List<Triangle3D> m_listTriangles = new List<Triangle3D>();
+
+    public float m_middleX;
+    public float m_middleY;
+    public float m_middleZ;
 
     public string m_MatShaderName;
     public string m_MatMainTextureName;
@@ -50,6 +69,15 @@ public class SmfMesh : UnityEngine.Object
         sr.Close();
         aFile.Close();
 
+        for(int i = 0; i < m_listPoints.Count; i++)
+        {
+            m_middleX += m_listPoints[i].x;
+            m_middleY += m_listPoints[i].y;
+            m_middleZ += m_listPoints[i].z;
+        }
+        m_middleX /= m_listPoints.Count;
+        m_middleY /= m_listPoints.Count;
+        m_middleZ /= m_listPoints.Count;
     }
 
     public void saveFile(string filepath, float width, float height, int row, int col, string shaderName, string texName)
@@ -99,7 +127,7 @@ public class SmfMesh : UnityEngine.Object
         sb.Append(texName);
         sb.Append("\r\n");
 
-        FileStream fs = new FileStream(filepath, FileMode.OpenOrCreate);
+        FileStream fs = new FileStream(filepath, FileMode.Create);
         StreamWriter sw = new StreamWriter(fs);
         sw.Write(sb.ToString());
 
